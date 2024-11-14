@@ -1,3 +1,5 @@
 .venvkerasandtf/
 data/
-
+trained_models/
+export_figs/
+trained_models/
