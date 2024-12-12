@@ -28,12 +28,21 @@ def automapRecon(ksp,mps,model_real_dir,model_imag_dir):
     kspflat = np.swapaxes(kspflat,1,2)
     kspflat = np.reshape(kspflat,(ksp_hybrid.shape[0]*ksp_hybrid.shape[3],-1),order='F')
 
+    
     scale = 1
+    #scale = 1/np.percentile(np.abs(kspflat),99.8)*0.01
+    #scale = 0.09
+    #print(scale)
     kspflat = kspflat*scale
 
+    #scale = 1/np.percentile(np.abs(kspflat),99.5,axis=1)
+
     amapinput = np.concatenate((np.real(kspflat),np.imag(kspflat)),axis=1)
+    #amapinput = amapinput/np.amax(amapinput)
 
     # loading models for inference
+    #model_real = tf.saved_model.load(model_real_dir)
+    #model_imag = tf.saved_model.load(model_imag_dir)
     model_real = keras.models.load_model(model_real_dir)
     model_imag = keras.models.load_model(model_imag_dir)
     
@@ -47,7 +56,8 @@ def automapRecon(ksp,mps,model_real_dir,model_imag_dir):
     padding=4
     
     preds_img = predictions.reshape(predictions.shape[0],ksp_channels.shape[1]+2*padding,ksp_channels.shape[2]+2*padding, order = 'F')
-    preds_img_crop = preds_img[:,padding:-padding,padding:-padding]
+    preds_img_crop = preds_img[:,padding:-padding,padding:-padding]#.reshape(predictions.shape[0],ksp_channels.shape[2],ksp_channels.shape[1])
+
     
     # mc - multi-channel
     volume_mc = np.reshape(preds_img_crop,(ksp_channels.shape[0],ksp_channels.shape[3],ksp_channels.shape[1],ksp_channels.shape[2]), order = 'F')    
@@ -59,5 +69,8 @@ def automapRecon(ksp,mps,model_real_dir,model_imag_dir):
     
     #coil combination using sensitivity maps
     volume = coil_combine(volume_mc,mps)
+    
+    #volume_rsos = np.moveaxis(volume_rsos,1,-1)
+    #volume_mc = np.moveaxis(volume_mc,2,-1)
     
     return volume, volume_mc
