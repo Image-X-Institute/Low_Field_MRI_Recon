@@ -3,3 +3,5 @@ data/
 trained_models/
 export_figs/
 trained_models/
+__pycache__/
+.ipynb_checkpoints/

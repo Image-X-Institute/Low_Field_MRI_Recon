@@ -3,7 +3,7 @@ import torch.nn as nn
 import numpy as np
 import scipy.io as scio
 
-from trained_models.Unrolling.DisCorNet_DC import * 
+from trained_models.Unrolling.UnrollNet_DC import * 
 import time 
 from collections import OrderedDict
 import sigpy as sp
@@ -91,7 +91,7 @@ def unrollingRecon(inputKspace,mask,model_pth):
             print(mx_size)
             
             ## the state_dict contains parameters, 14 items per unroll layer
-            Unrolling_chi = DisCorNet(int(len(state_dict)/14), (mx_size[1], mx_size[3]), ini_flag = False)
+            Unrolling_chi = UnrollNet(int(len(state_dict)/14), (mx_size[1], mx_size[3]), ini_flag = False)
             
             Unrolling_chi.load_state_dict(new_state_dict)
 
