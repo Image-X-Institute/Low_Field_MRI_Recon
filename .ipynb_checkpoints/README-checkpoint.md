@@ -17,7 +17,7 @@ The following Jupyter notebooks were used to generate figures contained in the m
 - FigD_retro_ulf_3T_compare.ipynb: Figure 6
 - FigE_prospective_recon-phantom-brain.ipynb: Figure 7
 
-The following python files are needed to run the Jupyter notebooks
+The following python files are needed to run the Jupyter notebooks:
 - automap_fns.py: Code for applying AUTOMAP to k-space data.
 - display_fns.py: Code for displaying images as subplots that compare various reconstruction methods.
 - metrics.py: Code for calculating image reconstruction metrics such as NRMSE and SSIM.
@@ -44,5 +44,5 @@ Reconstruction approaches were adapted from code associated with the following p
 3. N. Koonjoo, B. Zhu, G. C. Bagnall, D. Bhutto, M. S. Rosen, Boosting the signal-to-noise of low-field MRI with deep learning image reconstruction. Scientific Reports 11, 8248-8248 (2021). 
 
 AI models were trained using data sourced from the following publications and their public repositories:
-4. Q. Fan, T. Witzel, A. Nummenmaa, K. R. A. Van Dijk, J. D. Van Horn, M. K. Drews, L. H. Somerville, M. A. Sheridan, R. M. Santillana, J. Snyder, T. Hedden, E. E. Shaw, M. O. Hollinshead, V. Renvall, R. Zanzonico, B. Keil, S. Cauley, J. R. Polimeni, D. Tisdall, R. L. Buckner, V. J. Wedeen, L. L. Wald, A. W. Toga, B. R. Rosen, MGH–USC Human Connectome Project datasets with ultra-high b-value diffusion MRI. NeuroImage 124, 1108-1114 (2016).
-5. F. Knoll, J. Zbontar, A. Sriram, M. J. Muckley, M. Bruno, A. Defazio, M. Parente, K. J. Geras, J. Katsnelson, H. Chandarana, Z. Zhang, M. Drozdzalv, A. Romero, M. Rabbat, P. Vincent, J. Pinkerton, D. Wang, N. Yakubova, E. Owens, C. L. Zitnick, M. P. Recht, D. K. Sodickson, Y. W. Lui, fastMRI: A Publicly Available Raw k-Space and DICOM Dataset of Knee Images for Accelerated MR Image Reconstruction Using Machine Learning. Radiology: Artificial Intelligence 2, e190007-e190007 (2020).
+1. Q. Fan, T. Witzel, A. Nummenmaa, K. R. A. Van Dijk, J. D. Van Horn, M. K. Drews, L. H. Somerville, M. A. Sheridan, R. M. Santillana, J. Snyder, T. Hedden, E. E. Shaw, M. O. Hollinshead, V. Renvall, R. Zanzonico, B. Keil, S. Cauley, J. R. Polimeni, D. Tisdall, R. L. Buckner, V. J. Wedeen, L. L. Wald, A. W. Toga, B. R. Rosen, MGH–USC Human Connectome Project datasets with ultra-high b-value diffusion MRI. NeuroImage 124, 1108-1114 (2016).
+2. F. Knoll, J. Zbontar, A. Sriram, M. J. Muckley, M. Bruno, A. Defazio, M. Parente, K. J. Geras, J. Katsnelson, H. Chandarana, Z. Zhang, M. Drozdzalv, A. Romero, M. Rabbat, P. Vincent, J. Pinkerton, D. Wang, N. Yakubova, E. Owens, C. L. Zitnick, M. P. Recht, D. K. Sodickson, Y. W. Lui, fastMRI: A Publicly Available Raw k-Space and DICOM Dataset of Knee Images for Accelerated MR Image Reconstruction Using Machine Learning. Radiology: Artificial Intelligence 2, e190007-e190007 (2020).
