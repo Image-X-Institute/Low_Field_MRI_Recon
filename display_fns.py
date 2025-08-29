@@ -183,4 +183,71 @@ def compareFourPlot(GT,vol1,vol1title,vol2,vol2title,vol3,vol3title,vol4,vol4tit
     
     print('Difference Maps are scaled by ',scale_err)
     
-    return fig    
+    return fig
+
+def compare_n_plot(GT, volumes, titles, slc, scale_err=1.0):
+    """
+    Compare N reconstructions to a ground truth volume and plot their slices + error maps.
+
+    Args:
+        GT (np.ndarray): Ground truth 3D volume [H, W, D] (complex or real).
+        volumes (list of np.ndarray): List of reconstructed 3D volumes.
+        titles (list of str): List of corresponding titles.
+        slc (int): Slice index to display.
+        scale_err (float): Scale factor for error map visualization.
+
+    Returns:
+        fig (matplotlib.figure.Figure): The generated figure.
+    """
+    n = len(volumes)
+    assert len(titles) == n, "Number of titles must match number of volumes"
+
+    # Transpose to match plotting convention
+    GT = np.swapaxes(GT, 0, 1)
+    volumes = [np.swapaxes(vol, 0, 1) for vol in volumes]
+
+    # RO 64, 2.5 mm | PE1 75, 3.5 mm
+    asp_ratio = (GT.shape[0] * 3.5) / (GT.shape[1] * 2.5)
+    max_GT = np.amax(np.abs(GT[:, :, slc]))
+
+    fig, axs = plt.subplots(2, n + 1, figsize=(2.2 * (n + 1), 5))
+
+    # Plot GT
+    axs[0, 0].imshow(np.abs(GT[:, :, slc]), cmap='gray', vmin=0, vmax=1.05 * max_GT)
+    axs[0, 0].set_title('Ground Truth')
+    axs[0, 0].set_xticks([])
+    axs[0, 0].set_yticks([])
+    axs[0, 0].set_aspect(asp_ratio)
+    axs[1, 0].axis('off')
+
+    # Plot reconstructions and differences
+    for i in range(n):
+        vol = (volumes[i])
+        title = titles[i]
+
+        axs[0, i + 1].imshow(np.abs(vol[:, :, slc]), cmap='gray', vmin=0, vmax=1.05 * max_GT)
+        axs[0, i + 1].set_title(title)
+        axs[0, i + 1].set_xticks([])
+        axs[0, i + 1].set_yticks([])
+        axs[0, i + 1].set_aspect(asp_ratio)
+
+        diff_map = scale_err * np.abs(np.abs(vol[:, :, slc]) - np.abs(GT[:, :, slc]))
+        im = axs[1, i + 1].imshow(diff_map, cmap='gray', vmin=0, vmax=1.05 * max_GT)
+        axs[1, i + 1].set_xticks([])
+        axs[1, i + 1].set_yticks([])
+        axs[1, i + 1].set_aspect(asp_ratio)
+
+        # Use your custom metrics
+        ssim_val = ssim(np.abs(vol), np.abs(GT))
+        nrmse_val = nrmse(np.abs(vol), np.abs(GT))
+        axs[1, i + 1].set_xlabel(f'SSIM = {ssim_val:.2f}\nNRMSE = {nrmse_val:.3f}')
+
+    # Colorbar for difference maps
+    fig.subplots_adjust(right=0.85, hspace=-0.3)
+    cbar_ax = fig.add_axes([0.87, 0.15, 0.02, 0.7])
+    fig.colorbar(im, cax=cbar_ax)
+
+    plt.show()
+    print('Difference Maps are scaled by', scale_err)
+    return fig
+

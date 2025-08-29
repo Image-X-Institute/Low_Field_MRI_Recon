@@ -35,8 +35,8 @@ def calc_SSIM(I_pred,I_true):
             I_true = np.squeeze(I_true_vol[:,:,slc])
             I_pred = np.squeeze(I_pred_vol[:,:,slc])
             # convert the images from float32 to uint8 format
-            im1_mag_uint8 = (I_true * 255 / np.max(I_true)).astype('uint8')
-            im2_mag_uint8 = (I_pred * 255 / np.max(I_pred)).astype('uint8')
+            im1_mag_uint8 = (I_true * 255 / (np.max(I_true)+1e-8)).astype('uint8')
+            im2_mag_uint8 = (I_pred * 255 / (np.max(I_pred)+1e-8)).astype('uint8')
             # convert from numpy array to PIL format
             im1_PIL = Image.fromarray(im1_mag_uint8)
             im2_PIL = Image.fromarray(im2_mag_uint8)

@@ -1,8 +1,14 @@
+import multiprocessing as mp
+mp.set_start_method("spawn", force=True)
+
+
 # CS Recon Functions for ULF MRI Experiments - Updated by D Waddington 2022
 import numpy as np
 import matplotlib.pyplot as plt
 
 import sigpy as sp
+sp.config.use_cuda = False
+sp.config.use_opencl = False
 import sigpy.mri as mr
 import sigpy.plot as pl
 
@@ -71,9 +77,13 @@ def find_lamda_mask(ksp, GT, mps=float('nan'), calib_size=10, show_plot=True, it
 
     nrmse_vals = np.zeros((lamda_vals.size))
     ssim_vals = np.zeros((lamda_vals.size))
-        
-    mask_metrics = np.ma.getmask(np.ma.masked_less(abs(GT),0.0001))
-    GT[mask_metrics]=0
+
+    mask_metrics = abs(GT) < 1e-4
+    GT_masked = np.copy(GT)
+    GT_masked[mask_metrics] = 0
+
+    #mask_metrics = np.ma.getmask(np.ma.masked_less(abs(GT),0.0001))
+    #GT[mask_metrics]=0
     
     i = 0
     for lamda in lamda_vals:        
@@ -117,8 +127,12 @@ def find_iter_mask(ksp,GT, lamda_opt, mps=float('nan'), show_plot=True):
     ssim_iter_vals = np.zeros((iter_vals.size))
     
     #mask_metrics = np.ma.getmask(np.ma.masked_less(abs(GT),0.15))
-    mask_metrics = np.ma.getmask(np.ma.masked_less(abs(GT),0.0001))
-    GT[mask_metrics]=0
+    #mask_metrics = np.ma.getmask(np.ma.masked_less(abs(GT),0.0001))
+    #GT[mask_metrics]=0
+    mask_metrics = abs(GT) < 1e-4
+    GT_masked = np.copy(GT)
+    GT_masked[mask_metrics] = 0
+
     
     i = 0
     for iter in iter_vals:
@@ -192,3 +206,77 @@ def awgn(s,SNRdB,L=1):
         n = sqrt(N0/2)*(standard_normal(s.shape)+1j*standard_normal(s.shape))
     r = s + n # received signal
     return r
+
+import numpy as np
+import matplotlib.pyplot as plt
+from multiprocessing import Pool
+from tqdm import tqdm  # Optional: for showing progress
+import pickle
+
+# def _recon_for_lamda(args):
+#     lamda, ksp, mps, GT_masked, mask_metrics, iter = args
+
+
+
+#     for name, obj in [('ksp', ksp), ('mps', mps),
+#                       ('GT_masked', GT_masked), ('mask_metrics', mask_metrics)]:
+#         try:
+#             pickle.dumps(obj)
+#         except Exception as e:
+#             print(f"[Pickle FAIL] {name}: {type(obj)} → {e}")
+    
+#     img = ulfl1recon(ksp, np.ones((ksp.shape[1],ksp.shape[3]),dtype='complex64'), lamda, iter=iter, mps=mps)
+#     img[mask_metrics] = 0
+#     return lamda, nrmse(abs(img), abs(GT_masked)), ssim(abs(img), abs(GT_masked))
+
+
+# def find_lamda_mask(ksp, GT, mps, calib_size=10, show_plot=False, iter=30, use_tqdm=False):
+#     lamda_vals = np.array([
+#         1E-4, 2E-4, 5E-4, 1E-3, 2E-3, 5E-3, 1E-2, 2E-2, 5E-2,
+#         1E-1, 2E-1, 5E-1, 1, 2, 5, 10, 20
+#     ])
+
+#     ksp = np.asarray(ksp)
+#     mps = np.asarray(mps)
+#     GT = np.asarray(GT)
+
+#     if ksp.ndim == 3:
+#         ksp = ksp[np.newaxis, ...]
+
+#     mask_metrics = abs(GT) < 1e-4
+#     GT_masked = np.copy(GT)
+#     GT_masked[mask_metrics] = 0
+
+#     # Package all arguments explicitly to avoid partial
+#     job_args = [(lamda, ksp, mps, GT_masked, mask_metrics, iter) for lamda in lamda_vals]
+
+#     for i, args in enumerate(job_args):
+#         try:
+#             pickle.dumps(args)
+#         except Exception as e:
+#             print(f"[Pickle FAIL] job_args[{i}] → {e}")
+    
+#     with Pool(processes=10) as pool:
+#         if use_tqdm:
+#             results = list(tqdm(pool.imap(_recon_for_lamda, job_args), total=len(job_args)))
+#         else:
+#             results = pool.map(_recon_for_lamda, job_args)
+
+#     lamdas, nrmse_vals, ssim_vals = zip(*results)
+#     lamda_opt = lamdas[np.argmin(nrmse_vals)]
+
+#     if show_plot:
+#         fig, ax1 = plt.subplots()
+#         ax1.plot(lamdas, nrmse_vals, 'bo-', label='NRMSE')
+#         ax1.set_xscale('log')
+#         ax1.set_xlabel('Lamda')
+#         ax1.set_ylabel('NRMSE')
+#         ax2 = ax1.twinx()
+#         ax2.plot(lamdas, ssim_vals, 'ro-', label='SSIM')
+#         ax2.set_ylabel('SSIM')
+#         plt.title(f'Lamda Optimization (opt = {lamda_opt})')
+#         fig.tight_layout()
+#         plt.show()
+
+#     return lamda_opt
+

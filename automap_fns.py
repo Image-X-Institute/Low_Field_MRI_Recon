@@ -33,9 +33,19 @@ def automapRecon(ksp,mps,model_real_dir,model_imag_dir):
 
     amapinput = np.concatenate((np.real(kspflat),np.imag(kspflat)),axis=1)
 
-    # loading models for inference
-    model_real = keras.models.load_model(model_real_dir)
-    model_imag = keras.models.load_model(model_imag_dir)
+    # # loading models for inference
+    # model_real = keras.models.load_model(model_real_dir)
+    # model_imag = keras.models.load_model(model_imag_dir)
+        # Load models only if strings are passed
+    if isinstance(model_real_dir, str):
+        model_real = keras.models.load_model(model_real_dir)
+    else:
+        model_real = model_real_dir
+
+    if isinstance(model_imag_dir, str):
+        model_imag = keras.models.load_model(model_imag_dir)
+    else:
+        model_imag = model_imag_dir
     
 
     # run inference on real and imaginary channels then combine into one complex array

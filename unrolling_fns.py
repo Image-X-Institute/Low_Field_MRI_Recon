@@ -88,7 +88,7 @@ def unrollingRecon(inputKspace,mask,model_pth):
             #print(len(state_dict))
             #print(state_dict.keys())
             mx_size = inputKspace.shape
-            print(mx_size)
+            #print(mx_size)
             
             ## the state_dict contains parameters, 14 items per unroll layer
             Unrolling_chi = UnrollNet(int(len(state_dict)/14), (mx_size[1], mx_size[3]), ini_flag = False)
