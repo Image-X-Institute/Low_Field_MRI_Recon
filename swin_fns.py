@@ -86,8 +86,10 @@ def reconstruct_slice_swin(kspace_lr, mask_lr, model, device='cuda', target_size
     # --- Reconstruct final image from cropped k-space ---
     recon_cplx_crop = ifft2t(torch.tensor(kspace_fused_crop).unsqueeze(0).unsqueeze(0).to(device))  # [1, 1, H, W]
     recon_img_crop = torch.abs(recon_cplx_crop.squeeze()).cpu().numpy()
+    recon_cplx_crop = recon_cplx_crop.squeeze().cpu().numpy()
+    
 
-    return recon_img_crop, kspace_fused_crop
+    return recon_cplx_crop, kspace_fused_crop
 
 def swinRecon(kspace, mask, model, device='cuda', target_size=(96, 96)):
     """
@@ -142,81 +144,8 @@ def swinRecon(kspace, mask, model, device='cuda', target_size=(96, 96)):
     recon_vol = np.transpose(recon_vol, (1, 0, 2))         # [PE1, RO, PE2]
     kspace_filled_vol = np.transpose(kspace_filled_vol, (1, 0, 2))
 
-    # # Call the new batched volume reconstruction function
-    # batch_size=8
-    # recon_vol, kspace_filled_vol = reconstruct_vol_swin(
-    #     hybrid_space,
-    #     mask_full,
-    #     model,
-    #     device=device,
-    #     target_size=target_size,
-    #     batch_size=batch_size
-    # )
-    
-    # # Return in original orientation: [PE1, RO, PE2]
-    # recon_vol = np.transpose(recon_vol, (1, 0, 2))
-    # kspace_filled_vol = np.transpose(kspace_filled_vol, (1, 0, 2))
+
     
     return recon_vol, kspace_filled_vol
 
-# def reconstruct_vol_swin(kspace_vol, mask_vol, model, device='cuda', target_size=(96, 96), batch_size=32):
-#     import torch
-#     import numpy as np
-#     import sigpy as sp
-#     from trained_models.SwinCascade.swin_utils import (
-#         fft2t, ifft2t, complex_to_channels, channels_to_complex, pad_or_crop
-#     )
 
-#     model.eval()
-#     RO = kspace_vol.shape[0]
-#     hybrid_space = sp.ifft(kspace_vol, axes=(0,), center=True)
-
-#     recon_slices = []
-#     kspace_slices = []
-
-#     for batch_start in range(0, RO, batch_size):
-#         batch_end = min(batch_start + batch_size, RO)
-#         batch_slices = hybrid_space[batch_start:batch_end]
-#         batch_masks = mask_vol[batch_start:batch_end]
-
-#         originals = [s.shape for s in batch_slices]
-
-#         # Pad and convert to tensors
-#         batch_kspace_hr = [pad_or_crop(s, target_size) for s in batch_slices]
-#         batch_mask_hr = [pad_or_crop(m, target_size) for m in batch_masks]
-
-#         kspace_tensor = torch.stack([torch.tensor(k) for k in batch_kspace_hr]).to(device)  # [B, H, W]
-#         mask_tensor = torch.stack([torch.tensor(np.real(m)) for m in batch_mask_hr]).unsqueeze(1).float().to(device)  # [B, 1, H, W]
-
-#         # IFFT to image domain
-#         img_cplx = ifft2t(kspace_tensor.unsqueeze(1))  # [B, 1, H, W]
-#         zf_img = complex_to_channels(img_cplx)         # [B, 2, H, W]
-
-#         zf_max = torch.amax(torch.abs(zf_img), dim=(1,2,3), keepdim=True)  # [B, 1, 1, 1]
-#         zf_img_scaled = zf_img / (zf_max + 1e-8)
-
-#         with torch.no_grad():
-#             recon_scaled = model(zf_img_scaled, mask_tensor)  # [B, 2, H, W]
-
-#         # Rescale
-#         recon = recon_scaled * zf_max
-#         recon_cplx = channels_to_complex(recon)[:, 0]  # [B, H, W]
-
-#         # Compute k-space
-#         kspace_fused = fft2t(recon_cplx.unsqueeze(1))  # [B, 1, H, W]
-
-#         for i in range(batch_end - batch_start):
-#             crop_size = originals[i]
-#             kf_crop = pad_or_crop(kspace_fused[i, 0].cpu().numpy(), crop_size)
-
-#             # Convert to proper complex tensor
-#             kf_tensor = torch.tensor(kf_crop).to(device)
-#             recon_crop = ifft2t(kf_tensor[None, None])  # [1, 1, H, W]
-#             recon_img = torch.abs(recon_crop.squeeze()).cpu().numpy()
-
-#             recon_slices.append(recon_img)
-#             kspace_slices.append(kf_crop)
-
-#     recon_vol = np.stack(recon_slices, axis=0)         # [RO, PE1, PE2]
-#     kspace_filled_vol = np.stack(kspace_slices, axis=0)
-#     return recon_vol, kspace_filled_vol

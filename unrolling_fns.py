@@ -8,6 +8,8 @@ import time
 from collections import OrderedDict
 import sigpy as sp
 
+from ulf_recon_fns import coil_combine
+
 def zero_filling(x, factor = 16):
     H = x.size(0)
     W = x.size(1)
@@ -67,7 +69,7 @@ def zero_removing(x, pos):
     x = x[a:c, b:d, e:f]
     return x
 
-def unrollingRecon(inputKspace,mask,model_pth):
+def unrollingRecon(inputKspace,mask,mps,model_pth):
     with torch.no_grad():        
 
             
@@ -164,6 +166,10 @@ def unrollingRecon(inputKspace,mask,model_pth):
 
                     recon_vol_mc[j,:,k,:] = pred_chi
 
-            recon_vol = np.sum(np.abs(recon_vol_mc)**2, axis=0)**0.5
+            recon_vol_abs = np.sum(np.abs(recon_vol_mc)**2, axis=0)**0.5
 
-            return recon_vol
+            
+            recon_vol_cplx = coil_combine(recon_vol_mc,mps)
+            
+
+            return recon_vol_abs, recon_vol_cplx
