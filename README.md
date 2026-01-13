@@ -1,6 +1,6 @@
 # Low_Field_MRI_Recon
 
-## Accelerating Low-field MRI: Compressed Sensing and AI for Fast Noise-robust Imaging
+## Accelerating Low-field MRI: From Compressed Sensing to Deep Learning Reconstruction with CNNs and Transformers
 
 Authors: David Waddington, Efrat Shimron, Shanshan Shan, Neha Koonjoo.
 
